@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventario — Dos Tiempos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — paleta "Dos Tiempos"
+============================================================ */
+:root{
+  --cream:#fdfcf9;
+  --cream-deep:#f6f3ec;
+  --olive:#4a5849;
+  --olive-soft:#6f7d6c;
+  --gold:#c2b29a;
+  --gold-deep:#a98f6c;
+  --gold-fade:rgba(194,178,154,0.16);
+  --white:#ffffff;
+  --danger:#a85c4a;
+  --ok:#5c7d5e;
+  --border:rgba(194,178,154,0.35);
+  --shadow:0 2px 4px rgba(74,88,73,0.05), 0 14px 40px rgba(74,88,73,0.08);
+  --f-display:'Cormorant Garamond', Georgia, serif;
+  --f-body:'Montserrat', system-ui, sans-serif;
+  --r:10px;
+  --ease:cubic-bezier(.25,1,.5,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--cream);
+  font-family:var(--f-body);
+  color:var(--olive);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  padding:32px 16px 80px;
+  display:flex;flex-direction:column;align-items:center;
+}
+
+/* ============================================================
+   SHELL / CARD
+============================================================ */
+.shell{max-width:1080px;width:100%;}
+
+.card{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  margin-bottom:28px;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.header{
+  padding:40px 48px 32px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(160deg,#ffffff 60%, var(--gold-fade) 100%);
+  position:relative;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+}
+.header::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.header-text .eyebrow{
+  font-size:.7rem;font-weight:500;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--gold-deep);margin-bottom:10px;
+}
+.header-text h1{
+  font-family:var(--f-display);font-size:clamp(1.9rem,4vw,2.6rem);
+  font-weight:500;color:var(--olive);letter-spacing:.04em;line-height:1.1;
+}
+.header-text .subtitle{
+  font-family:var(--f-display);font-style:italic;font-size:1.15rem;
+  color:var(--gold-deep);margin-top:6px;
+}
+
+/* ============================================================
+   BOTONES BASE
+============================================================ */
+.btn{
+  font-family:var(--f-body);
+  font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+  padding:12px 26px;border-radius:6px;cursor:pointer;
+  border:1px solid var(--gold);background:transparent;color:var(--olive);
+  transition:background .25s var(--ease),color .25s var(--ease),
+             border-color .25s var(--ease),box-shadow .25s var(--ease);
+  white-space:nowrap;
+}
+.btn:hover{background:var(--gold-fade);}
+.btn.solid{background:var(--olive);color:var(--white);border-color:var(--olive);}
+.btn.solid:hover{background:#3b463a;}
+.btn.active{background:var(--olive);color:var(--white);border-color:var(--olive);
+  box-shadow:0 4px 14px rgba(74,88,73,.18);}
+.btn.small{padding:9px 18px;font-size:.7rem;}
+.btn:focus-visible{outline:2px solid var(--olive);outline-offset:2px;}
+
+/* ============================================================
+   TABS DE INVENTARIO
+============================================================ */
+.tabs{
+  display:flex;gap:12px;padding:24px 48px 0;flex-wrap:wrap;
+}
+@media (max-width:560px){.tabs{padding:20px 20px 0;}}
+
+/* ============================================================
+   CONTENIDO PRINCIPAL
+============================================================ */
+.content{padding:32px 48px 48px;}
+@media (max-width:560px){.content{padding:24px 20px 36px;}}
+
+.panel{display:none;animation:fadeUp .35s var(--ease) both;}
+.panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============================================================
+   SECCIÓN / CATEGORÍA
+============================================================ */
+.section{margin-bottom:48px;}
+.section:last-child{margin-bottom:0;}
+.section-head{
+  display:flex;align-items:center;gap:16px;margin-bottom:24px;
+}
+.section-head .diamond{
+  width:8px;height:8px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;
+}
+.section-head h2{
+  font-family:var(--f-display);font-size:clamp(1.3rem,2.4vw,1.7rem);
+  font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--olive);
+  white-space:nowrap;
+}
+.section-head .line{flex:1;height:1px;background:linear-gradient(to right,var(--border) 60%,transparent);}
+
+.grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:18px;
+}
+@media (max-width:720px){.grid{grid-template-columns:1fr;}}
+
+/* ============================================================
+   TARJETA DE PRODUCTO (trabajador)
+============================================================ */
+.product{
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:18px 20px;background:var(--cream);
+  transition:border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.product:hover{border-color:var(--gold-deep);box-shadow:var(--shadow);}
+.product.faltante{
+  border-color:var(--olive);background:linear-gradient(to right, rgba(74,88,73,.05), var(--cream) 60%);
+}
+
+.product-top{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;
+}
+.product-name{
+  display:flex;align-items:center;gap:10px;
+}
+.dot{
+  width:9px;height:9px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;
+  transition:background .2s var(--ease);
+}
+.product.faltante .dot{background:var(--olive);}
+.product-name span{
+  font-family:var(--f-display);font-size:1.25rem;font-weight:500;color:var(--olive);
+}
+.product-qty{
+  font-family:var(--f-display);font-weight:600;font-size:1.05rem;color:var(--gold-deep);
+  white-space:nowrap;flex-shrink:0;
+}
+
+.slider-row{margin:14px 0 12px;}
+input[type=range]{
+  width:100%;-webkit-appearance:none;appearance:none;
+  height:4px;border-radius:4px;background:var(--border);outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--gold-deep);border:2px solid var(--white);box-shadow:0 1px 4px rgba(74,88,73,.3);
+  transition:transform .15s var(--ease), background .15s var(--ease);
+}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);background:var(--olive);}
+input[type=range]::-moz-range-thumb{
+  width:18px;height:18px;border-radius:50%;background:var(--gold-deep);
+  border:2px solid var(--white);box-shadow:0 1px 4px rgba(74,88,73,.3);cursor:pointer;
+}
+.product.faltante input[type=range]::-webkit-slider-thumb,
+.product.faltante input[type=range]::-moz-range-thumb{background:var(--olive);}
+
+.product-bottom{display:flex;justify-content:flex-end;}
+
+.toggle-faltante{
+  font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  padding:8px 16px;border-radius:5px;cursor:pointer;border:1px solid var(--gold);
+  background:var(--gold-fade);color:var(--gold-deep);
+  transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease);
+}
+.toggle-faltante.on{background:var(--olive);color:var(--white);border-color:var(--olive);}
+
+/* Botón discreto para agregar comentarios por producto */
+.comment-toggle{
+  font-size:.7rem;font-weight:500;color:var(--olive-soft);
+  background:none;border:none;cursor:pointer;
+  text-decoration:underline;text-decoration-color:var(--border);
+  padding:4px 0;transition:color .2s var(--ease);
+}
+.comment-toggle:hover{color:var(--gold-deep);}
+.comment-toggle.has-text{color:var(--gold-deep);font-weight:600;}
+
+.comment-box{display:none;margin-top:10px;}
+.comment-box.open{display:block;}
+.comment-box textarea{
+  width:100%;min-height:56px;resize:vertical;
+  font-family:var(--f-body);font-size:.8rem;color:var(--olive);
+  border:1px solid var(--border);border-radius:6px;padding:8px 10px;
+  background:var(--white);outline:none;
+}
+.comment-box textarea:focus{border-color:var(--gold-deep);}
+
+/* ============================================================
+   RESUMEN DE FALTANTES
+============================================================ */
+.missing-card{
+  background:var(--cream-deep);border:1px solid var(--border);border-radius:var(--r);
+  padding:24px 28px;
+}
+.missing-empty{font-size:.85rem;color:var(--olive-soft);font-style:italic;}
+.missing-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.missing-list li{
+  display:flex;align-items:center;gap:12px;font-size:.92rem;color:var(--olive);
+}
+.missing-list li .dot{background:var(--olive);}
+.missing-list li b{font-family:var(--f-display);font-size:1.1rem;font-weight:600;}
+.missing-list li small{color:var(--olive-soft);margin-left:auto;}
+
+/* ============================================================
+   BARRA INFERIOR DE GUARDADO
+============================================================ */
+.save-bar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+  border-top:1px solid var(--border);padding:24px 48px;background:var(--cream-deep);
+}
+@media (max-width:560px){.save-bar{padding:20px;}}
+.save-status{font-size:.8rem;color:var(--olive-soft);}
+.save-status b{color:var(--olive);}
+
+/* El campo de nombre ocupa ancho fijo en escritorio, completo en móvil */
+.employee-field{min-width:220px;}
+.employee-field input{width:100%;}
+
+@media (max-width:720px){
+  .save-bar{flex-direction:column;align-items:stretch;}
+  .employee-field{min-width:0;width:100%;}
+  .save-status{order:2;text-align:left;}
+  .save-bar > .btn{order:3;width:100%;text-align:center;}
+}
+
+/* ============================================================
+   MODAL CONTRASEÑA
+============================================================ */
+dialog{
+  border:none;border-radius:var(--r);padding:0;box-shadow:var(--shadow);
+  max-width:380px;width:90%;
+}
+dialog::backdrop{background:rgba(74,88,73,.35);backdrop-filter:blur(2px);}
+.modal-inner{padding:32px 32px 28px;}
+.modal-inner h3{
+  font-family:var(--f-display);font-size:1.5rem;font-weight:500;color:var(--olive);
+  margin-bottom:6px;
+}
+.modal-inner p{font-size:.85rem;color:var(--olive-soft);margin-bottom:20px;}
+.modal-inner input[type=password]{
+  width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:6px;
+  font-family:var(--f-body);font-size:.95rem;color:var(--olive);background:var(--cream);
+  margin-bottom:8px;outline:none;
+}
+.modal-inner input[type=password]:focus{border-color:var(--gold-deep);}
+.modal-error{font-size:.78rem;color:var(--danger);min-height:1.2em;margin-bottom:12px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+
+/* ============================================================
+   VISTA DUEÑO — FILTROS
+============================================================ */
+.filters{
+  display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;
+  background:var(--cream-deep);border:1px solid var(--border);border-radius:var(--r);
+  padding:20px 24px;margin-bottom:32px;
+}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--olive-soft);}
+.field input, .field select{
+  font-family:var(--f-body);font-size:.85rem;color:var(--olive);
+  border:1px solid var(--border);border-radius:6px;padding:9px 12px;background:var(--white);
+  outline:none;
+}
+.field input:focus,.field select:focus{border-color:var(--gold-deep);}
+.field.grow{flex:1;min-width:160px;}
+
+/* ============================================================
+   FILA DE COMPRA (vista dueño)
+============================================================ */
+.purchase-row{
+  display:flex;align-items:center;gap:14px;padding:12px 0;
+  border-bottom:1px solid var(--border);
+}
+.purchase-row:last-child{border-bottom:none;}
+.purchase-row .dot{flex-shrink:0;}
+.purchase-row .pname{
+  font-family:var(--f-display);font-size:1.15rem;font-weight:500;color:var(--olive);
+  flex:1;min-width:120px;
+}
+.purchase-row .ideal{
+  font-size:.75rem;color:var(--olive-soft);min-width:90px;text-align:right;
+}
+.purchase-row input[type=text]{
+  width:90px;text-align:right;font-family:var(--f-body);font-size:.85rem;
+  border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--olive);
+  background:var(--white);outline:none;
+}
+.purchase-row input[type=text]:focus{border-color:var(--gold-deep);}
+.purchase-row .unit{font-size:.78rem;color:var(--olive-soft);min-width:30px;}
+
+@media (max-width:560px){
+  .purchase-row{flex-wrap:wrap;}
+  .purchase-row .ideal{order:4;width:100%;text-align:left;}
+}
+
+/* ============================================================
+   FOOTER / PERFIL
+============================================================ */
+.owner-footer{
+  display:flex;align-items:center;gap:12px;padding:20px 48px;
+  border-top:1px solid var(--border);background:var(--cream-deep);
+}
+@media (max-width:560px){.owner-footer{padding:18px 20px;}}
+.profile-icon{
+  width:38px;height:38px;border-radius:50%;background:var(--olive);color:var(--white);
+  display:flex;align-items:center;justify-content:center;font-family:var(--f-display);
+  font-size:1.1rem;font-weight:600;flex-shrink:0;
+}
+.profile-meta{font-size:.78rem;color:var(--olive-soft);line-height:1.4;}
+.profile-meta b{color:var(--olive);font-weight:600;}
+
+/* ============================================================
+   UTILIDADES
+============================================================ */
+.hidden{display:none !important;}
+.reduce-motion-safe{}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition:none !important;animation:none !important;}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ====================================================
+       VISTA TRABAJADOR
+  ==================================================== -->
+  <div id="view-worker">
+    <div class="card">
+
+      <!-- HEADER -->
+      <header class="header">
+        <div class="header-text">
+          <p class="eyebrow">Inventario de "Dos Tiempos"</p>
+          <h1>Dos Tiempos — Inventario Diario</h1>
+          <p class="subtitle">Registro rápido de existencias</p>
+        </div>
+        <button class="btn" onclick="openOwnerModal()">Vista del Dueño</button>
+      </header>
+
+      <!-- TABS -->
+      <nav class="tabs" id="worker-tabs">
+        <button class="btn active" id="wtab-trad" onclick="switchWorkerTab('trad', this)">Inventario Tradicional</button>
+        <button class="btn" id="wtab-esp" onclick="switchWorkerTab('esp', this)">Menú Especial</button>
+      </nav>
+
+      <!-- CONTENIDO -->
+      <div class="content">
+        <div id="wpanel-trad" class="panel active"></div>
+        <div id="wpanel-esp" class="panel"></div>
+
+        <!-- RESUMEN DE FALTANTES -->
+        <div class="section" style="margin-top:8px;">
+          <div class="section-head">
+            <div class="diamond"></div>
+            <h2>Resumen de Faltantes</h2>
+            <div class="line"></div>
+          </div>
+          <div class="missing-card" id="missing-summary">
+            <p class="missing-empty">No hay productos marcados como faltantes.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GUARDAR -->
+      <div class="save-bar">
+        <div class="field employee-field">
+          <label for="employee-name">Registrado por</label>
+          <input type="text" id="employee-name" placeholder="Escribe tu nombre" autocomplete="off">
+        </div>
+        <p class="save-status">
+          Última actualización: <b id="last-saved">sin registros aún</b><br>
+          Registrado por: <b id="last-employee">—</b>
+        </p>
+        <button class="btn solid" onclick="saveInventory()">Guardar Inventario</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====================================================
+       VISTA DUEÑO
+  ==================================================== -->
+  <div id="view-owner" class="hidden">
+    <div class="card">
+
+      <!-- HEADER -->
+      <header class="header">
+        <div class="header-text">
+          <p class="eyebrow">Inventario de "Dos Tiempos"</p>
+          <h1>Dos Tiempos — Reportes de Inventario</h1>
+          <p class="subtitle">Vista exclusiva del dueño</p>
+        </div>
+        <button class="btn" onclick="closeOwnerView()">Volver al Inventario (Trabajador)</button>
+      </header>
+
+      <!-- TABS -->
+      <nav class="tabs" id="owner-tabs">
+        <button class="btn active" id="otab-trad" onclick="switchOwnerTab('trad', this)">Inventario Tradicional</button>
+        <button class="btn" id="otab-esp" onclick="switchOwnerTab('esp', this)">Menú Especial</button>
+      </nav>
+
+      <!-- CONTENIDO -->
+      <div class="content">
+
+        <!-- FILTROS -->
+        <div class="filters">
+          <div class="field">
+            <label>Fecha de inicio</label>
+            <input type="date" id="report-start">
+          </div>
+          <div class="field">
+            <label>Fecha de fin</label>
+            <input type="date" id="report-end">
+          </div>
+          <div class="field">
+            <label>Período rápido</label>
+            <select id="report-period" onchange="applyQuickPeriod()">
+              <option value="">Personalizado</option>
+              <option value="week">Última semana</option>
+              <option value="month">Último mes</option>
+            </select>
+          </div>
+          <div class="field grow">
+            <label>Filtrar por categoría</label>
+            <select id="report-category"></select>
+          </div>
+          <button class="btn solid" onclick="generateReport()">Generar Reporte</button>
+        </div>
+
+        <!-- HISTORIAL DE REGISTROS -->
+        <div class="section">
+          <div class="section-head">
+            <div class="diamond"></div>
+            <h2>Historial de Registros</h2>
+            <div class="line"></div>
+          </div>
+          <div class="missing-card" id="history-log"></div>
+        </div>
+
+        <!-- REPORTE -->
+        <div id="report-output"></div>
+
+        <!-- ACCIONES -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:32px;">
+          <button class="btn solid" onclick="savePurchases()">Guardar Reporte</button>
+          <button class="btn" onclick="exportPDF()">Exportar a PDF</button>
+          <button class="btn" onclick="exportExcel()">Exportar a Excel</button>
+        </div>
+        <p class="save-status" style="margin-top:14px;">Reporte guardado: <b id="purchases-saved">sin registros aún</b></p>
+      </div>
+
+      <!-- FOOTER PERFIL -->
+      <footer class="owner-footer">
+        <div class="profile-icon">DT</div>
+        <div class="profile-meta">
+          <b>Dueño · Dos Tiempos</b><br>
+          Acceso exclusivo a reportes de inventario
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ====================================================
+     MODAL CONTRASEÑA
+==================================================== -->
+<dialog id="owner-modal">
+  <div class="modal-inner">
+    <h3>Vista del Dueño</h3>
+    <p>Ingresa la contraseña para acceder a los reportes de inventario.</p>
+    <input type="password" id="owner-password" placeholder="Contraseña" autocomplete="off">
+    <p class="modal-error" id="owner-error"></p>
+    <div class="modal-actions">
+      <button class="btn small" onclick="closeOwnerModal()">Cancelar</button>
+      <button class="btn small solid" onclick="checkOwnerPassword()">Entrar</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* ================================================================
+   1. CONFIGURACIÓN GENERAL
+================================================================ */
+
+// Interruptor: activa o desactiva la sección "Menú Especial"
+// tanto en la vista del trabajador como en la del dueño.
+const menuEspecialDisponible = true;
+
+// Contraseña de acceso a la vista del dueño (cámbiala libremente).
+const OWNER_PASSWORD = "dostiempos2024";
+
+// Categorías. id 10 = especial.
+const CATEGORIES = {
+  1: "Salsas y Base",
+  2: "Carnes",
+  3: "Quesos",
+  4: "Frijol y Acompañamientos",
+  5: "Waffles y Repostería",
+  6: "Ingredientes de Repostería",
+  7: "Omelette y Papas",
+  8: "Bebidas y Jugos",
+  9: "Batidos",
+  10: "Especialidades (Menú Especial)"
+};
+
+/* ================================================================
+   2. CATÁLOGO DE PRODUCTOS
+   max  = capacidad máxima de referencia (100% del slider)
+   step = incremento del slider
+   ideal = nivel ideal de reorden (lúdico, usado en reportes)
+================================================================ */
+const PRODUCTS = [
+  {id:"tomate", name:"Tomate", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"tomato_sauce", name:"Tomato Sauce", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"queso_crema", name:"Queso crema", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"chipotle", name:"Chipotle", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"cilantro", name:"Cilantro", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"pure_tomate", name:"Puré de tomate", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"cebolla_morada", name:"Cebolla morada", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"cebolla_blanca", name:"Cebolla blanca", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"ajo", name:"Ajo", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"sal", name:"Sal", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"pimienta", name:"Pimienta", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"totopos", name:"Totopos", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"rajas", name:"Rajas", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"media_crema", name:"Media crema", cat:1, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"leche", name:"Leche", cat:1, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"huevo", name:"Huevo", cat:1, unit:"pz", max:10, step:0.5, ideal:7},
+  {id:"birria", name:"Birria", cat:2, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"pollo", name:"Pollo", cat:2, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"chicharron", name:"Chicharrón", cat:2, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"queso_mozz", name:"Queso mozzarella", cat:3, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"queso_amarillo", name:"Queso amarillo", cat:3, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"frijol", name:"Frijol", cat:4, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"tocino", name:"Tocino", cat:4, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"aguacate", name:"Aguacate", cat:4, unit:"pz", max:10, step:0.5, ideal:7},
+  {id:"waffles", name:"Waffles", cat:5, unit:"pz", max:10, step:0.5, ideal:7},
+  {id:"harina", name:"Harina", cat:5, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"pan_muffin", name:"Pan de muffin", cat:5, unit:"pz", max:10, step:0.5, ideal:7},
+  {id:"pan_masa_madre", name:"Pan de masa madre", cat:5, unit:"pz", max:10, step:0.5, ideal:7},
+  {id:"platano", name:"Plátano", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"canela", name:"Canela", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"vainilla", name:"Vainilla", cat:6, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"azucar", name:"Azúcar", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"nutella", name:"Nutella", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"fresas", name:"Fresas", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"granola", name:"Granola", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"crema_cacahuate", name:"Crema de cacahuate", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"nieve", name:"Nieve", cat:6, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"espinaca", name:"Espinaca", cat:7, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"jamon", name:"Jamón", cat:7, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"papas", name:"Papas", cat:7, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"jugo_naranja", name:"Jugo de naranja (insumo)", cat:8, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"jugo_verde", name:"Jugo verde (insumos: nopal, piña, pepino, espinaca, apio, manzana)", cat:8, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"jugo_energetico", name:"Jugo energético (insumos: plátano, fresa, blueberry, piña)", cat:8, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"jamaica", name:"Jamaica", cat:8, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"limon", name:"Limón", cat:8, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"cafe", name:"Café", cat:8, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"crema_cafe", name:"Crema para café", cat:8, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"chocomilk", name:"Chocomilk", cat:8, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"sodas", name:"Sodas", cat:8, unit:"pz", max:10, step:0.5, ideal:7},
+  {id:"proteina_vainilla", name:"Proteína de vainilla", cat:9, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"proteina_chocolate", name:"Proteína de chocolate", cat:9, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"pan_hamburguesa", name:"Pan de hamburguesa", cat:10, unit:"pz", max:10, step:0.5, ideal:7},
+  {id:"carne_molida", name:"Carne de res molida", cat:10, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"cebolla_caramelizada", name:"Cebolla caramelizada", cat:10, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"papas_fritas", name:"Papas para fritas", cat:10, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"masa_churros", name:"Masa para churros", cat:10, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"masa_crepas", name:"Masa para crepas", cat:10, unit:"L", max:10, step:0.5, ideal:7},
+];
+
+/* ================================================================
+   3. ESTADO / PERSISTENCIA (LocalStorage)
+================================================================ */
+const LS_INVENTORY = "dt_inventory_v1";
+const LS_PURCHASES = "dt_purchases_v1";
+
+// Carga el inventario actual desde LocalStorage, o crea valores por defecto.
+function loadInventory(){
+  const raw = localStorage.getItem(LS_INVENTORY);
+  if(raw){
+    try { return JSON.parse(raw); } catch(e){ /* sigue abajo */ }
+  }
+  // Estado inicial: cada producto al 70% de su capacidad, sin faltantes manuales.
+  const data = { items:{}, lastSaved:null, lastEmployee:null };
+  PRODUCTS.forEach(p=>{
+    data.items[p.id] = { qty: Math.round(p.max*0.7*100)/100, manualFaltante:false, comment:"" };
+  });
+  return data;
+}
+
+let inventoryState = loadInventory();
+
+// Asegurar compatibilidad con inventarios guardados antes de agregar comentarios
+PRODUCTS.forEach(p=>{
+  if(!inventoryState.items[p.id]) {
+    inventoryState.items[p.id] = { qty: Math.round(p.max*0.7*100)/100, manualFaltante:false, comment:"" };
+  } else if(inventoryState.items[p.id].comment === undefined){
+    inventoryState.items[p.id].comment = "";
+  }
+});
+
+function persistInventory(){
+  localStorage.setItem(LS_INVENTORY, JSON.stringify(inventoryState));
+}
+
+/* ================================================================
+   4. RENDER — VISTA TRABAJADOR
+================================================================ */
+
+// Determina si un producto está "Faltante": manual o porque la cantidad es 0.
+function isFaltante(p){
+  const item = inventoryState.items[p.id];
+  return item.manualFaltante || item.qty <= 0;
+}
+
+// Formatea la cantidad con su unidad de forma legible.
+function formatQty(p, qty){
+  const decimals = p.step < 1 ? 1 : 0;
+  return `${qty.toFixed(decimals)} ${p.unit}`;
+}
+
+// Construye el HTML de una tarjeta de producto.
+function renderProductCard(p){
+  const item = inventoryState.items[p.id];
+  const faltante = isFaltante(p);
+  return `
+    <div class="product ${faltante?'faltante':''}" id="card-${p.id}">
+      <div class="product-top">
+        <div class="product-name">
+          <span class="dot"></span>
+          <span>${p.name}</span>
+        </div>
+        <div class="product-qty">◆ ${formatQty(p, item.qty)}</div>
+      </div>
+      <div class="slider-row">
+        <input type="range" min="0" max="${p.max}" step="${p.step}"
+               value="${item.qty}"
+               oninput="updateQty('${p.id}', this.value)">
+      </div>
+      <div class="product-bottom" style="flex-direction:column;align-items:flex-start;gap:6px;">
+        <button class="toggle-faltante ${item.manualFaltante?'on':''}"
+                onclick="toggleFaltante('${p.id}')">
+          Marcar como Faltante
+        </button>
+        <button class="comment-toggle ${item.comment?'has-text':''}" id="ctoggle-${p.id}"
+                onclick="toggleCommentBox('${p.id}')">
+          ${item.comment ? '✎ Ver / editar comentario' : '+ Agregar comentario'}
+        </button>
+      </div>
+      <div class="comment-box" id="cbox-${p.id}">
+        <textarea placeholder="Ej. llegó dañado, falta confirmar con proveedor..."
+                  oninput="updateComment('${p.id}', this.value)">${item.comment || ""}</textarea>
+      </div>
+    </div>`;
+}
+
+// Renderiza todas las categorías de un grupo (tradicional o especial) en un panel.
+function renderWorkerPanel(panelId, catIds){
+  const panel = document.getElementById(panelId);
+  let html = "";
+  catIds.forEach(catId=>{
+    const items = PRODUCTS.filter(p=>p.cat===catId);
+    if(items.length===0) return;
+    html += `
+      <div class="section">
+        <div class="section-head">
+          <div class="diamond"></div>
+          <h2>${CATEGORIES[catId]}</h2>
+          <div class="line"></div>
+        </div>
+        <div class="grid">
+          ${items.map(renderProductCard).join("")}
+        </div>
+      </div>`;
+  });
+  panel.innerHTML = html;
+}
+
+// Actualiza la cantidad de un producto al mover el slider.
+function updateQty(id, value){
+  const p = PRODUCTS.find(x=>x.id===id);
+  inventoryState.items[id].qty = parseFloat(value);
+  refreshCard(p);
+  renderMissingSummary();
+}
+
+// Alterna el estado manual de "Faltante" para un producto.
+function toggleFaltante(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  inventoryState.items[id].manualFaltante = !inventoryState.items[id].manualFaltante;
+  refreshCard(p);
+  renderMissingSummary();
+}
+
+// Muestra u oculta la caja de comentario de un producto.
+function toggleCommentBox(id){
+  const box = document.getElementById(`cbox-${id}`);
+  box.classList.toggle("open");
+  if(box.classList.contains("open")){
+    box.querySelector("textarea").focus();
+  }
+}
+
+// Guarda el texto del comentario en el estado y actualiza el botón discreto.
+function updateComment(id, value){
+  inventoryState.items[id].comment = value;
+  const btn = document.getElementById(`ctoggle-${id}`);
+  if(value.trim() !== ""){
+    btn.textContent = "✎ Ver / editar comentario";
+    btn.classList.add("has-text");
+  } else {
+    btn.textContent = "+ Agregar comentario";
+    btn.classList.remove("has-text");
+  }
+}
+
+// Refresca visualmente una sola tarjeta sin re-renderizar todo el panel.
+function refreshCard(p){
+  const item = inventoryState.items[p.id];
+  const card = document.getElementById(`card-${p.id}`);
+  if(!card) return;
+  const faltante = isFaltante(p);
+  card.classList.toggle("faltante", faltante);
+  card.querySelector(".product-qty").textContent = `◆ ${formatQty(p, item.qty)}`;
+  const btn = card.querySelector(".toggle-faltante");
+  btn.classList.toggle("on", item.manualFaltante);
+}
+
+// Renderiza el panel de "Resumen de Faltantes".
+function renderMissingSummary(){
+  const container = document.getElementById("missing-summary");
+  const missing = PRODUCTS.filter(isFaltante);
+  if(missing.length===0){
+    container.innerHTML = `<p class="missing-empty">No hay productos marcados como faltantes.</p>`;
+    return;
+  }
+  container.innerHTML = `
+    <ul class="missing-list">
+      ${missing.map(p=>`
+        <li>
+          <span class="dot"></span>
+          <b>${p.name}</b>
+          <small>${CATEGORIES[p.cat]}</small>
+        </li>`).join("")}
+    </ul>`;
+}
+
+// Guarda el inventario actual en LocalStorage con marca de tiempo,
+// y conserva un historial breve para los reportes del dueño.
+function saveInventory(){
+  const nameInput = document.getElementById("employee-name");
+  const employeeName = nameInput.value.trim();
+
+  // Validación: el nombre es obligatorio para identificar quién registró el inventario
+  if(employeeName === ""){
+    nameInput.style.borderColor = "var(--danger)";
+    nameInput.focus();
+    nameInput.placeholder = "Escribe tu nombre para poder guardar";
+    return;
+  }
+  nameInput.style.borderColor = "";
+
+  inventoryState.lastSaved = new Date().toISOString();
+  inventoryState.lastEmployee = employeeName;
+  persistInventory();
+
+  // Guardar snapshot en el historial (para cálculos de reporte)
+  const history = JSON.parse(localStorage.getItem("dt_history_v1") || "[]");
+  history.push({
+    date: inventoryState.lastSaved,
+    employee: employeeName,
+    items: JSON.parse(JSON.stringify(inventoryState.items))
+  });
+  // Conservar como máximo los últimos 120 registros
+  while(history.length > 120) history.shift();
+  localStorage.setItem("dt_history_v1", JSON.stringify(history));
+
+  renderLastSaved();
+}
+
+function renderLastSaved(){
+  const el = document.getElementById("last-saved");
+  const elEmp = document.getElementById("last-employee");
+  if(!inventoryState.lastSaved){
+    el.textContent = "sin registros aún";
+    elEmp.textContent = "—";
+    return;
+  }
+  const d = new Date(inventoryState.lastSaved);
+  el.textContent = d.toLocaleString("es-MX", {
+    day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"
+  });
+  elEmp.textContent = inventoryState.lastEmployee || "—";
+
+  // Precargar el campo de nombre con el último empleado que guardó,
+  // para agilizar registros consecutivos del mismo turno.
+  const nameInput = document.getElementById("employee-name");
+  if(nameInput && !nameInput.value){
+    nameInput.value = inventoryState.lastEmployee || "";
+  }
+}
+
+/* ================================================================
+   5. TABS — VISTA TRABAJADOR
+================================================================ */
+function switchWorkerTab(tab, btn){
+  document.querySelectorAll("#worker-tabs .btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("wpanel-trad").classList.toggle("active", tab==="trad");
+  document.getElementById("wpanel-esp").classList.toggle("active", tab==="esp");
+}
+
+/* ================================================================
+   6. MODAL / ACCESO VISTA DUEÑO
+================================================================ */
+function openOwnerModal(){
+  document.getElementById("owner-error").textContent = "";
+  document.getElementById("owner-password").value = "";
+  document.getElementById("owner-modal").showModal();
+  document.getElementById("owner-password").focus();
+}
+function closeOwnerModal(){
+  document.getElementById("owner-modal").close();
+}
+function checkOwnerPassword(){
+  const val = document.getElementById("owner-password").value;
+  if(val === OWNER_PASSWORD){
+    closeOwnerModal();
+    document.getElementById("view-worker").classList.add("hidden");
+    document.getElementById("view-owner").classList.remove("hidden");
+    initOwnerView();
+  } else {
+    document.getElementById("owner-error").textContent = "Contraseña incorrecta. Intenta de nuevo.";
+  }
+}
+function closeOwnerView(){
+  document.getElementById("view-owner").classList.add("hidden");
+  document.getElementById("view-worker").classList.remove("hidden");
+}
+
+// Permite confirmar con Enter dentro del modal
+document.addEventListener("DOMContentLoaded", ()=>{
+  document.getElementById("owner-password").addEventListener("keydown", e=>{
+    if(e.key === "Enter") checkOwnerPassword();
+  });
+
+  // Restaurar el borde normal del campo de nombre al escribir
+  document.getElementById("employee-name").addEventListener("input", function(){
+    this.style.borderColor = "";
+  });
+});
+
+/* ================================================================
+   7. TABS — VISTA DUEÑO  (Inventario Tradicional / Menú Especial)
+================================================================ */
+let ownerActiveCats = [1,2,3,4,5,6,7,8,9]; // tradicional por defecto
+
+function switchOwnerTab(tab, btn){
+  document.querySelectorAll("#owner-tabs .btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  ownerActiveCats = (tab==="esp") ? [10] : [1,2,3,4,5,6,7,8,9];
+  populateCategoryFilter();
+  generateReport();
+}
+
+/* ================================================================
+   8. INICIALIZACIÓN VISTA DUEÑO
+================================================================ */
+// Muestra los últimos registros guardados por el personal, con fecha y nombre.
+function renderHistoryLog(){
+  const container = document.getElementById("history-log");
+  const history = JSON.parse(localStorage.getItem("dt_history_v1") || "[]");
+
+  if(history.length === 0){
+    container.innerHTML = `<p class="missing-empty">Aún no hay registros de inventario guardados.</p>`;
+    return;
+  }
+
+  // Mostrar los últimos 8 registros, del más reciente al más antiguo
+  const recent = history.slice(-8).reverse();
+  container.innerHTML = `
+    <ul class="missing-list">
+      ${recent.map(h=>{
+        const d = new Date(h.date);
+        const fecha = d.toLocaleString("es-MX", {
+          day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"
+        });
+        return `
+          <li>
+            <span class="dot"></span>
+            <b>${h.employee || "Sin nombre"}</b>
+            <small>${fecha}</small>
+          </li>`;
+      }).join("")}
+    </ul>`;
+}
+
+function initOwnerView(){
+  // Fechas por defecto: última semana
+  const end = new Date();
+  const start = new Date();
+  start.setDate(end.getDate()-7);
+  document.getElementById("report-start").value = toDateInput(start);
+  document.getElementById("report-end").value   = toDateInput(end);
+  document.getElementById("report-period").value = "week";
+
+  populateCategoryFilter();
+  generateReport();
+  renderPurchasesSaved();
+  renderHistoryLog();
+}
+
+function toDateInput(d){
+  return d.toISOString().slice(0,10);
+}
+
+// Llena el select de categorías según el grupo activo (tradicional/especial)
+function populateCategoryFilter(){
+  const select = document.getElementById("report-category");
+  let options = `<option value="all">Ver Todo</option>`;
+  ownerActiveCats.forEach(catId=>{
+    options += `<option value="${catId}">${CATEGORIES[catId]}</option>`;
+  });
+  select.innerHTML = options;
+}
+
+// Atajos de período: última semana / último mes
+function applyQuickPeriod(){
+  const period = document.getElementById("report-period").value;
+  if(!period) return;
+  const end = new Date();
+  const start = new Date();
+  if(period === "week") start.setDate(end.getDate()-7);
+  if(period === "month") start.setMonth(end.getMonth()-1);
+  document.getElementById("report-start").value = toDateInput(start);
+  document.getElementById("report-end").value   = toDateInput(end);
+}
+
+/* ================================================================
+   9. GENERACIÓN DE REPORTES
+   Lógica: para cada producto, se compara la cantidad registrada
+   más antigua y más reciente dentro del rango de fechas.
+   - Si el producto estuvo marcado "Faltante" en algún punto del
+     rango, se asume que se realizó una compra de reabastecimiento
+     hasta su nivel "ideal" (ideal de reorden).
+   - Si no, la compra estimada es el incremento neto de existencias
+     (cantidad final - cantidad inicial), si fue positivo.
+   Estos valores son editables por el dueño antes de guardar.
+================================================================ */
+function generateReport(){
+  const startVal = document.getElementById("report-start").value;
+  const endVal   = document.getElementById("report-end").value;
+  const catFilter = document.getElementById("report-category").value;
+
+  const start = startVal ? new Date(startVal+"T00:00:00") : null;
+  const end   = endVal   ? new Date(endVal+"T23:59:59")   : null;
+
+  const history = JSON.parse(localStorage.getItem("dt_history_v1") || "[]");
+  const inRange = history.filter(h=>{
+    const d = new Date(h.date);
+    return (!start || d >= start) && (!end || d <= end);
+  });
+
+  // Cargar compras previamente guardadas (para no perder ediciones manuales)
+  const savedPurchases = JSON.parse(localStorage.getItem(LS_PURCHASES) || "{}").items || {};
+
+  const productsToShow = PRODUCTS.filter(p=>{
+    if(!ownerActiveCats.includes(p.cat)) return false;
+    if(catFilter !== "all" && String(p.cat) !== catFilter) return false;
+    return true;
+  });
+
+  // Calcular estimado de compra por producto
+  const estimates = {};
+  productsToShow.forEach(p=>{
+    let qtyStart, qtyEnd, wasFaltante=false;
+
+    if(inRange.length > 0){
+      qtyStart = inRange[0].items[p.id]?.qty ?? inventoryState.items[p.id].qty;
+      qtyEnd   = inRange[inRange.length-1].items[p.id]?.qty ?? inventoryState.items[p.id].qty;
+      wasFaltante = inRange.some(h => {
+        const it = h.items[p.id];
+        return it && (it.manualFaltante || it.qty <= 0);
+      });
+    } else {
+      // Sin registros en el rango: usar el estado actual como referencia
+      qtyStart = inventoryState.items[p.id].qty;
+      qtyEnd   = inventoryState.items[p.id].qty;
+      wasFaltante = isFaltante(p);
+    }
+
+    let estimate = Math.max(0, qtyEnd - qtyStart);
+    if(wasFaltante) estimate = Math.max(estimate, p.ideal);
+
+    estimates[p.id] = Math.round(estimate*100)/100;
+  });
+
+  renderReport(productsToShow, estimates, savedPurchases);
+}
+
+// Renderiza el reporte agrupado por categoría con campos editables.
+function renderReport(products, estimates, savedPurchases){
+  const container = document.getElementById("report-output");
+  const byCat = {};
+  products.forEach(p=>{ (byCat[p.cat] = byCat[p.cat] || []).push(p); });
+
+  if(products.length===0){
+    container.innerHTML = `<p class="missing-empty">No hay productos para mostrar con estos filtros.</p>`;
+    return;
+  }
+
+  let html = "";
+  Object.keys(byCat).forEach(catId=>{
+    html += `
+      <div class="section">
+        <div class="section-head">
+          <div class="diamond"></div>
+          <h2>${CATEGORIES[catId]}</h2>
+          <div class="line"></div>
+        </div>
+        <div>
+          ${byCat[catId].map(p=>{
+            const saved = savedPurchases[p.id];
+            const value = (saved !== undefined) ? saved : estimates[p.id];
+            const decimals = p.step < 1 ? 1 : 0;
+            return `
+              <div class="purchase-row">
+                <span class="dot"></span>
+                <span class="pname">${p.name}</span>
+                <span class="ideal">ideal: ${p.ideal.toFixed(decimals)} ${p.unit}</span>
+                <input type="text" id="purchase-${p.id}" value="${value.toFixed(decimals)}"
+                       inputmode="decimal">
+                <span class="unit">${p.unit}</span>
+              </div>`;
+          }).join("")}
+        </div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+/* ================================================================
+   10. GUARDAR REPORTE DE COMPRAS
+================================================================ */
+function savePurchases(){
+  const items = {};
+  PRODUCTS.forEach(p=>{
+    const input = document.getElementById(`purchase-${p.id}`);
+    if(input){
+      const val = parseFloat(input.value);
+      items[p.id] = isNaN(val) ? 0 : val;
+    }
+  });
+  const payload = { items, lastSaved: new Date().toISOString() };
+  localStorage.setItem(LS_PURCHASES, JSON.stringify(payload));
+  renderPurchasesSaved();
+}
+
+function renderPurchasesSaved(){
+  const raw = localStorage.getItem(LS_PURCHASES);
+  const el = document.getElementById("purchases-saved");
+  if(!raw){ el.textContent = "sin registros aún"; return; }
+  const data = JSON.parse(raw);
+  const d = new Date(data.lastSaved);
+  el.textContent = d.toLocaleString("es-MX", {
+    day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"
+  });
+}
+
+/* ================================================================
+   11. EXPORTACIÓN — PDF (impresión) y EXCEL (CSV)
+================================================================ */
+function exportPDF(){
+  window.print();
+}
+
+function exportExcel(){
+  const rows = [["Categoría","Producto","Cantidad comprada","Unidad","Ideal de reorden"]];
+  PRODUCTS.forEach(p=>{
+    if(!ownerActiveCats.includes(p.cat)) return;
+    const input = document.getElementById(`purchase-${p.id}`);
+    const value = input ? input.value : "";
+    if(input){
+      rows.push([CATEGORIES[p.cat], p.name, value, p.unit, p.ideal]);
+    }
+  });
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob(["\uFEFF"+csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `reporte_compras_dos_tiempos_${toDateInput(new Date())}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ================================================================
+   12. INICIALIZACIÓN GENERAL
+================================================================ */
+function init(){
+  // Ocultar pestaña/sección de Menú Especial si está deshabilitada
+  if(!menuEspecialDisponible){
+    document.getElementById("wtab-esp").classList.add("hidden");
+    document.getElementById("otab-esp").classList.add("hidden");
+  }
+
+  renderWorkerPanel("wpanel-trad", [1,2,3,4,5,6,7,8,9]);
+  renderWorkerPanel("wpanel-esp",  [10]);
+  renderMissingSummary();
+  renderLastSaved();
+}
+
+init();
+</script>
+</body>
+</html>
