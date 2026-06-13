@@ -125,7 +125,7 @@ body{
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
 /* ============================================================
-   SECCIÓN / CATEGORÍA
+   SECCIÓN / ZONAS DEL RESTAURANTE
 ============================================================ */
 .section{margin-bottom:48px;}
 .section:last-child{margin-bottom:0;}
@@ -207,7 +207,6 @@ input[type=range]::-moz-range-thumb{
 }
 .toggle-faltante.on{background:var(--olive);color:var(--white);border-color:var(--olive);}
 
-/* Botón discreto para agregar comentarios por producto */
 .comment-toggle{
   font-size:.7rem;font-weight:500;color:var(--olive-soft);
   background:none;border:none;cursor:pointer;
@@ -254,7 +253,6 @@ input[type=range]::-moz-range-thumb{
 .save-status{font-size:.8rem;color:var(--olive-soft);}
 .save-status b{color:var(--olive);}
 
-/* El campo de nombre ocupa ancho fijo en escritorio, completo en móvil */
 .employee-field{min-width:220px;}
 .employee-field input{width:100%;}
 
@@ -355,45 +353,66 @@ dialog::backdrop{background:rgba(74,88,73,.35);backdrop-filter:blur(2px);}
    UTILIDADES
 ============================================================ */
 .hidden{display:none !important;}
-.reduce-motion-safe{}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{transition:none !important;animation:none !important;}
 }
+
+/* ============================================================
+   IMPRESIÓN / EXPORTAR A PDF
+============================================================ */
+@media print{
+  body{padding:0;background:#fff;}
+  .shell{max-width:100%;}
+  #view-worker, .header, .tabs, .filters, #history-log, .save-bar, .owner-footer, dialog {
+    display:none !important;
+  }
+  .card{box-shadow:none;border:none;}
+  .content{padding:0;}
+  #report-output::before{
+    content:"Dos Tiempos — Reporte de Compras por Zona";
+    display:block;
+    font-family:var(--f-display);
+    font-size:1.8rem;
+    font-weight:600;
+    color:var(--olive);
+    margin-bottom:4px;
+  }
+  #print-meta{display:block !important;}
+  .section{margin-bottom:24px;page-break-inside:avoid;}
+  .section-head h2{font-size:1.1rem;}
+  .purchase-row{padding:6px 0;}
+  .purchase-row input[type=text]{border:none;background:none;font-weight:600;color:var(--olive);}
+  .ideal{display:none;}
+}
+#print-meta{display:none;}
 </style>
 </head>
 <body>
 
 <div class="shell">
 
-  <!-- ====================================================
-       VISTA TRABAJADOR
-  ==================================================== -->
   <div id="view-worker">
     <div class="card">
 
-      <!-- HEADER -->
       <header class="header">
         <div class="header-text">
           <p class="eyebrow">Inventario de "Dos Tiempos"</p>
           <h1>Dos Tiempos — Inventario Diario</h1>
-          <p class="subtitle">Registro rápido de existencias</p>
+          <p class="subtitle">Organizado por Zonas del Establecimiento</p>
         </div>
         <button class="btn" onclick="openOwnerModal()">Vista del Dueño</button>
       </header>
 
-      <!-- TABS -->
       <nav class="tabs" id="worker-tabs">
-        <button class="btn active" id="wtab-trad" onclick="switchWorkerTab('trad', this)">Inventario Tradicional</button>
+        <button class="btn active" id="wtab-trad" onclick="switchWorkerTab('trad', this)">Inventario por Zonas</button>
         <button class="btn" id="wtab-esp" onclick="switchWorkerTab('esp', this)">Menú Especial</button>
       </nav>
 
-      <!-- CONTENIDO -->
       <div class="content">
         <div id="wpanel-trad" class="panel active"></div>
         <div id="wpanel-esp" class="panel"></div>
 
-        <!-- RESUMEN DE FALTANTES -->
-        <div class="section" style="margin-top:8px;">
+        <div class="section" style="margin-top:24px;">
           <div class="section-head">
             <div class="diamond"></div>
             <h2>Resumen de Faltantes</h2>
@@ -405,7 +424,6 @@ dialog::backdrop{background:rgba(74,88,73,.35);backdrop-filter:blur(2px);}
         </div>
       </div>
 
-      <!-- GUARDAR -->
       <div class="save-bar">
         <div class="field employee-field">
           <label for="employee-name">Registrado por</label>
@@ -421,32 +439,25 @@ dialog::backdrop{background:rgba(74,88,73,.35);backdrop-filter:blur(2px);}
     </div>
   </div>
 
-  <!-- ====================================================
-       VISTA DUEÑO
-  ==================================================== -->
   <div id="view-owner" class="hidden">
     <div class="card">
 
-      <!-- HEADER -->
       <header class="header">
         <div class="header-text">
           <p class="eyebrow">Inventario de "Dos Tiempos"</p>
           <h1>Dos Tiempos — Reportes de Inventario</h1>
-          <p class="subtitle">Vista exclusiva del dueño</p>
+          <p class="subtitle">Vista exclusiva del dueño (por Zonas)</p>
         </div>
         <button class="btn" onclick="closeOwnerView()">Volver al Inventario (Trabajador)</button>
       </header>
 
-      <!-- TABS -->
       <nav class="tabs" id="owner-tabs">
-        <button class="btn active" id="otab-trad" onclick="switchOwnerTab('trad', this)">Inventario Tradicional</button>
+        <button class="btn active" id="otab-trad" onclick="switchOwnerTab('trad', this)">Reporte General Zonas</button>
         <button class="btn" id="otab-esp" onclick="switchOwnerTab('esp', this)">Menú Especial</button>
       </nav>
 
-      <!-- CONTENIDO -->
       <div class="content">
 
-        <!-- FILTROS -->
         <div class="filters">
           <div class="field">
             <label>Fecha de inicio</label>
@@ -465,13 +476,12 @@ dialog::backdrop{background:rgba(74,88,73,.35);backdrop-filter:blur(2px);}
             </select>
           </div>
           <div class="field grow">
-            <label>Filtrar por categoría</label>
+            <label>Filtrar por Zona</label>
             <select id="report-category"></select>
           </div>
           <button class="btn solid" onclick="generateReport()">Generar Reporte</button>
         </div>
 
-        <!-- HISTORIAL DE REGISTROS -->
         <div class="section">
           <div class="section-head">
             <div class="diamond"></div>
@@ -481,24 +491,21 @@ dialog::backdrop{background:rgba(74,88,73,.35);backdrop-filter:blur(2px);}
           <div class="missing-card" id="history-log"></div>
         </div>
 
-        <!-- REPORTE -->
+        <div id="print-meta"></div>
         <div id="report-output"></div>
 
-        <!-- ACCIONES -->
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:32px;">
           <button class="btn solid" onclick="savePurchases()">Guardar Reporte</button>
-          <button class="btn" onclick="exportPDF()">Exportar a PDF</button>
-          <button class="btn" onclick="exportExcel()">Exportar a Excel</button>
+          <button class="btn" onclick="window.print()">Exportar a PDF</button>
         </div>
         <p class="save-status" style="margin-top:14px;">Reporte guardado: <b id="purchases-saved">sin registros aún</b></p>
       </div>
 
-      <!-- FOOTER PERFIL -->
       <footer class="owner-footer">
         <div class="profile-icon">DT</div>
         <div class="profile-meta">
           <b>Dueño · Dos Tiempos</b><br>
-          Acceso exclusivo a reportes de inventario
+          Acceso exclusivo a reportes de inventario por zonas
         </div>
       </footer>
 
@@ -507,9 +514,6 @@ dialog::backdrop{background:rgba(74,88,73,.35);backdrop-filter:blur(2px);}
 
 </div>
 
-<!-- ====================================================
-     MODAL CONTRASEÑA
-==================================================== -->
 <dialog id="owner-modal">
   <div class="modal-inner">
     <h3>Vista del Dueño</h3>
@@ -525,43 +529,30 @@ dialog::backdrop{background:rgba(74,88,73,.35);backdrop-filter:blur(2px);}
 
 <script>
 /* ================================================================
-   1. CONFIGURACIÓN GENERAL
+   1. CONFIGURACIÓN GENERAL Y ZONAS
 ================================================================ */
-
-// Interruptor: activa o desactiva la sección "Menú Especial"
-// tanto en la vista del trabajador como en la del dueño.
 const menuEspecialDisponible = true;
-
-// Contraseña de acceso a la vista del dueño (cámbiala libremente).
 const OWNER_PASSWORD = "dostiempos2024";
 
-// Categorías. id 10 = especial.
+// Reorganizado por áreas físicas de trabajo
 const CATEGORIES = {
-  1: "Salsas y Base",
-  2: "Carnes",
-  3: "Quesos",
-  4: "Frijol y Acompañamientos",
-  5: "Waffles y Repostería",
-  6: "Ingredientes de Repostería",
-  7: "Omelette y Papas",
-  8: "Bebidas y Jugos",
-  9: "Batidos",
-  10: "Especialidades (Menú Especial)"
+  1: "Cocina",
+  2: "Cuarto de Bebidas",
+  3: "Barra",
+  10: "Especiales / Eventos"
 };
 
 /* ================================================================
-   2. CATÁLOGO DE PRODUCTOS
-   max  = capacidad máxima de referencia (100% del slider)
-   step = incremento del slider
-   ideal = nivel ideal de reorden (lúdico, usado en reportes)
+   2. CATÁLOGO TOTAL REORGANIZADO POR ZONAS
 ================================================================ */
 const PRODUCTS = [
+  // --- ZONA 1: COCINA ---
   {id:"tomate", name:"Tomate", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
   {id:"tomato_sauce", name:"Tomato Sauce", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
   {id:"queso_crema", name:"Queso crema", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
   {id:"chipotle", name:"Chipotle", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
   {id:"cilantro", name:"Cilantro", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"pure_tomate", name:"Puré de tomate", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"pure_de_tomate", name:"Puré de tomate", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
   {id:"cebolla_morada", name:"Cebolla morada", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
   {id:"cebolla_blanca", name:"Cebolla blanca", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
   {id:"ajo", name:"Ajo", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
@@ -571,48 +562,62 @@ const PRODUCTS = [
   {id:"rajas", name:"Rajas", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
   {id:"media_crema", name:"Media crema", cat:1, unit:"L", max:10, step:0.5, ideal:7},
   {id:"leche", name:"Leche", cat:1, unit:"L", max:10, step:0.5, ideal:7},
-  {id:"huevo", name:"Huevo", cat:1, unit:"pz", max:10, step:0.5, ideal:7},
-  {id:"birria", name:"Birria", cat:2, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"pollo", name:"Pollo", cat:2, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"chicharron", name:"Chicharrón", cat:2, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"queso_mozz", name:"Queso mozzarella", cat:3, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"queso_amarillo", name:"Queso amarillo", cat:3, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"frijol", name:"Frijol", cat:4, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"tocino", name:"Tocino", cat:4, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"aguacate", name:"Aguacate", cat:4, unit:"pz", max:10, step:0.5, ideal:7},
-  {id:"waffles", name:"Waffles", cat:5, unit:"pz", max:10, step:0.5, ideal:7},
-  {id:"harina", name:"Harina", cat:5, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"pan_muffin", name:"Pan de muffin", cat:5, unit:"pz", max:10, step:0.5, ideal:7},
-  {id:"pan_masa_madre", name:"Pan de masa madre", cat:5, unit:"pz", max:10, step:0.5, ideal:7},
-  {id:"platano", name:"Plátano", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"canela", name:"Canela", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"vainilla", name:"Vainilla", cat:6, unit:"L", max:10, step:0.5, ideal:7},
-  {id:"azucar", name:"Azúcar", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"nutella", name:"Nutella", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"fresas", name:"Fresas", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"granola", name:"Granola", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"crema_cacahuate", name:"Crema de cacahuate", cat:6, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"nieve", name:"Nieve", cat:6, unit:"L", max:10, step:0.5, ideal:7},
-  {id:"espinaca", name:"Espinaca", cat:7, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"jamon", name:"Jamón", cat:7, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"papas", name:"Papas", cat:7, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"jugo_naranja", name:"Jugo de naranja (insumo)", cat:8, unit:"L", max:10, step:0.5, ideal:7},
-  {id:"jugo_verde", name:"Jugo verde (insumos: nopal, piña, pepino, espinaca, apio, manzana)", cat:8, unit:"L", max:10, step:0.5, ideal:7},
-  {id:"jugo_energetico", name:"Jugo energético (insumos: plátano, fresa, blueberry, piña)", cat:8, unit:"L", max:10, step:0.5, ideal:7},
-  {id:"jamaica", name:"Jamaica", cat:8, unit:"L", max:10, step:0.5, ideal:7},
-  {id:"limon", name:"Limón", cat:8, unit:"L", max:10, step:0.5, ideal:7},
-  {id:"cafe", name:"Café", cat:8, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"crema_cafe", name:"Crema para café", cat:8, unit:"L", max:10, step:0.5, ideal:7},
-  {id:"chocomilk", name:"Chocomilk", cat:8, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"sodas", name:"Sodas", cat:8, unit:"pz", max:10, step:0.5, ideal:7},
-  {id:"proteina_vainilla", name:"Proteína de vainilla", cat:9, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"proteina_chocolate", name:"Proteína de chocolate", cat:9, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"pan_hamburguesa", name:"Pan de hamburguesa", cat:10, unit:"pz", max:10, step:0.5, ideal:7},
-  {id:"carne_molida", name:"Carne de res molida", cat:10, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"cebolla_caramelizada", name:"Cebolla caramelizada", cat:10, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"papas_fritas", name:"Papas para fritas", cat:10, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"masa_churros", name:"Masa para churros", cat:10, unit:"kg", max:10, step:0.5, ideal:7},
-  {id:"masa_crepas", name:"Masa para crepas", cat:10, unit:"L", max:10, step:0.5, ideal:7},
+  {id:"huevo", name:"Huevo", cat:1, unit:"pz", max:100, step:1, ideal:70},
+  {id:"birria", name:"Birria", cat:1, unit:"kg", max:15, step:0.5, ideal:10},
+  {id:"pollo", name:"Pollo", cat:1, unit:"kg", max:15, step:0.5, ideal:10},
+  {id:"chicharron", name:"Chicharrón", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"queso_mozzarella", name:"Queso mozzarella", cat:1, unit:"kg", max:15, step:0.5, ideal:10},
+  {id:"frijol", name:"Frijol", cat:1, unit:"kg", max:20, step:1, ideal:15},
+  {id:"harina", name:"Harina", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"platano", name:"Plátano", cat:1, unit:"kg", max:10, step:0.5, ideal:6},
+  {id:"tocino", name:"Tocino", cat:1, unit:"kg", max:8, step:0.5, ideal:5},
+  {id:"queso_amarillo", name:"Queso amarillo", cat:1, unit:"kg", max:5, step:0.2, ideal:4},
+  {id:"pan_de_muffin", name:"Pan de muffin", cat:1, unit:"pz", max:30, step:1, ideal:20},
+  {id:"jamon", name:"Jamón", cat:1, unit:"kg", max:10, step:0.5, ideal:7},
+  {id:"papas", name:"Papas", cat:1, unit:"kg", max:20, step:1, ideal:14},
+  {id:"pan_de_masa_madre", name:"Pan de masa madre", cat:1, unit:"pz", max:20, step:1, ideal:12},
+  {id:"aguacate", name:"Aguacate", cat:1, unit:"pz", max:40, step:1, ideal:30},
+  {id:"papel_cafe", name:"Papel café", cat:1, unit:"pz", max:10, step:1, ideal:5},
+  {id:"apio", name:"Apio", cat:1, unit:"kg", max:8, step:0.5, ideal:4},
+  {id:"manzana", name:"Manzana", cat:1, unit:"kg", max:10, step:0.5, ideal:6},
+  {id:"jamaica", name:"Jamaica", cat:1, unit:"L", max:20, step:1, ideal:15},
+  {id:"limon", name:"Limón", cat:1, unit:"kg", max:15, step:0.5, ideal:10},
+  {id:"jabon_para_trastes", name:"Jabón para trastes", cat:1, unit:"pz", max:6, step:1, ideal:4},
+  {id:"recipientes_para_llevar", name:"Recipientes para llevar", cat:1, unit:"pz", max:100, step:5, ideal:70},
+  {id:"vasos_desechable_para_salsa", name:"Vasos desechables salsa", cat:1, unit:"pz", max:100, step:5, ideal:80},
+  {id:"vasos_para_cafe", name:"Vasos para café", cat:1, unit:"pz", max:100, step:5, ideal:60},
+  {id:"envases_para_salsa_macha", name:"Envases salsa macha", cat:1, unit:"pz", max:50, step:1, ideal:30},
+
+  // --- ZONA 2: CUARTO DE BEBIDAS ---
+  {id:"naranja", name:"Naranja", cat:2, unit:"kg", max:30, step:1, ideal:20},
+  {id:"nopal", name:"Nopal", cat:2, unit:"kg", max:10, step:0.5, ideal:6},
+  {id:"pina", name:"Piña", cat:2, unit:"pz", max:15, step:1, ideal:10},
+  {id:"pepino", name:"Pepino", cat:2, unit:"kg", max:15, step:0.5, ideal:10},
+  {id:"blueberry", name:"Blueberry", cat:2, unit:"kg", max:5, step:0.1, ideal:3},
+  {id:"vasos_16_oz", name:"Vasos 16 oz", cat:2, unit:"pz", max:200, step:10, ideal:150},
+  {id:"tapas", name:"Tapas", cat:2, unit:"pz", max:200, step:10, ideal:150},
+  {id:"popotes", name:"Popotes", cat:2, unit:"pz", max:100, step:10, ideal:50},
+  {id:"proteina_en_polvo", name:"Proteína en polvo", cat:2, unit:"kg", max:6, step:0.2, ideal:4},
+  {id:"canela", name:"Canela", cat:2, unit:"kg", max:3, step:0.1, ideal:1.5},
+  {id:"vainilla", name:"Vainilla", cat:2, unit:"L", max:4, step:0.2, ideal:2},
+  {id:"chocomilk", name:"Chocomilk", cat:2, unit:"kg", max:5, step:0.5, ideal:3},
+  {id:"hielo", name:"Hielo", cat:2, unit:"kg", max:40, step:2, ideal:25},
+
+  // --- ZONA 3: BARRA ---
+  {id:"servilletas", name:"Servilletas", cat:3, unit:"pz", max:500, step:50, ideal:350},
+  {id:"cubiertos_de_plasticos", name:"Cubiertos de plástico", cat:3, unit:"pz", max:200, step:10, ideal:120},
+  {id:"azucar", name:"Azúcar", cat:3, unit:"kg", max:15, step:0.5, ideal:10},
+  {id:"stevia", name:"Stevia", cat:3, unit:"pz", max:100, step:10, ideal:70},
+  {id:"coffee_mate_en_polvo", name:"Coffee mate en polvo", cat:3, unit:"kg", max:6, step:0.2, ideal:4},
+  {id:"fresas", name:"Fresas", cat:3, unit:"kg", max:10, step:0.5, ideal:6},
+  {id:"mantequilla", name:"Mantequilla", cat:3, unit:"kg", max:8, step:0.2, ideal:5},
+
+  // --- COMPATIBILIDAD MENÚ ESPECIAL ---
+  {id:"waffles", name:"Waffles Lista", cat:10, unit:"pz", max:30, step:1, ideal:20},
+  {id:"nutella", name:"Nutella Especial", cat:10, unit:"pz", max:6, step:1, ideal:4},
+  {id:"granola", name:"Granola Pack", cat:10, unit:"kg", max:5, step:0.2, ideal:3},
+  {id:"crema_cacahuate", name:"Crema de Cacahuate", cat:10, unit:"pz", max:6, step:1, ideal:3},
+  {id:"nieve", name:"Nieve Bote", cat:10, unit:"pz", max:4, step:1, ideal:2}
 ];
 
 /* ================================================================
@@ -621,13 +626,11 @@ const PRODUCTS = [
 const LS_INVENTORY = "dt_inventory_v1";
 const LS_PURCHASES = "dt_purchases_v1";
 
-// Carga el inventario actual desde LocalStorage, o crea valores por defecto.
 function loadInventory(){
   const raw = localStorage.getItem(LS_INVENTORY);
   if(raw){
-    try { return JSON.parse(raw); } catch(e){ /* sigue abajo */ }
+    try { return JSON.parse(raw); } catch(e){}
   }
-  // Estado inicial: cada producto al 70% de su capacidad, sin faltantes manuales.
   const data = { items:{}, lastSaved:null, lastEmployee:null };
   PRODUCTS.forEach(p=>{
     data.items[p.id] = { qty: Math.round(p.max*0.7*100)/100, manualFaltante:false, comment:"" };
@@ -637,7 +640,6 @@ function loadInventory(){
 
 let inventoryState = loadInventory();
 
-// Asegurar compatibilidad con inventarios guardados antes de agregar comentarios
 PRODUCTS.forEach(p=>{
   if(!inventoryState.items[p.id]) {
     inventoryState.items[p.id] = { qty: Math.round(p.max*0.7*100)/100, manualFaltante:false, comment:"" };
@@ -653,20 +655,16 @@ function persistInventory(){
 /* ================================================================
    4. RENDER — VISTA TRABAJADOR
 ================================================================ */
-
-// Determina si un producto está "Faltante": manual o porque la cantidad es 0.
 function isFaltante(p){
   const item = inventoryState.items[p.id];
   return item.manualFaltante || item.qty <= 0;
 }
 
-// Formatea la cantidad con su unidad de forma legible.
 function formatQty(p, qty){
   const decimals = p.step < 1 ? 1 : 0;
   return `${qty.toFixed(decimals)} ${p.unit}`;
 }
 
-// Construye el HTML de una tarjeta de producto.
 function renderProductCard(p){
   const item = inventoryState.items[p.id];
   const faltante = isFaltante(p);
@@ -677,7 +675,7 @@ function renderProductCard(p){
           <span class="dot"></span>
           <span>${p.name}</span>
         </div>
-        <div class="product-qty">◆ ${formatQty(p, item.qty)}</div>
+        <div class="product-qty" id="qty-${p.id}">◆ ${formatQty(p, item.qty)}</div>
       </div>
       <div class="slider-row">
         <input type="range" min="0" max="${p.max}" step="${p.step}"
@@ -701,7 +699,6 @@ function renderProductCard(p){
     </div>`;
 }
 
-// Renderiza todas las categorías de un grupo (tradicional o especial) en un panel.
 function renderWorkerPanel(panelId, catIds){
   const panel = document.getElementById(panelId);
   let html = "";
@@ -723,7 +720,6 @@ function renderWorkerPanel(panelId, catIds){
   panel.innerHTML = html;
 }
 
-// Actualiza la cantidad de un producto al mover el slider.
 function updateQty(id, value){
   const p = PRODUCTS.find(x=>x.id===id);
   inventoryState.items[id].qty = parseFloat(value);
@@ -731,7 +727,6 @@ function updateQty(id, value){
   renderMissingSummary();
 }
 
-// Alterna el estado manual de "Faltante" para un producto.
 function toggleFaltante(id){
   const p = PRODUCTS.find(x=>x.id===id);
   inventoryState.items[id].manualFaltante = !inventoryState.items[id].manualFaltante;
@@ -739,427 +734,300 @@ function toggleFaltante(id){
   renderMissingSummary();
 }
 
-// Muestra u oculta la caja de comentario de un producto.
-function toggleCommentBox(id){
-  const box = document.getElementById(`cbox-${id}`);
-  box.classList.toggle("open");
-  if(box.classList.contains("open")){
-    box.querySelector("textarea").focus();
-  }
-}
-
-// Guarda el texto del comentario en el estado y actualiza el botón discreto.
 function updateComment(id, value){
   inventoryState.items[id].comment = value;
   const btn = document.getElementById(`ctoggle-${id}`);
-  if(value.trim() !== ""){
-    btn.textContent = "✎ Ver / editar comentario";
-    btn.classList.add("has-text");
+  if(value.trim()){
+    btn.classList.add('has-text');
+    btn.innerText = '✎ Ver / editar comentario';
   } else {
-    btn.textContent = "+ Agregar comentario";
-    btn.classList.remove("has-text");
+    btn.classList.remove('has-text');
+    btn.innerText = '+ Agregar comentario';
   }
 }
 
-// Refresca visualmente una sola tarjeta sin re-renderizar todo el panel.
+function toggleCommentBox(id){
+  const box = document.getElementById(`cbox-${id}`);
+  box.classList.toggle('open');
+}
+
 function refreshCard(p){
-  const item = inventoryState.items[p.id];
   const card = document.getElementById(`card-${p.id}`);
-  if(!card) return;
-  const faltante = isFaltante(p);
-  card.classList.toggle("faltante", faltante);
-  card.querySelector(".product-qty").textContent = `◆ ${formatQty(p, item.qty)}`;
-  const btn = card.querySelector(".toggle-faltante");
-  btn.classList.toggle("on", item.manualFaltante);
+  const qtyDisplay = document.getElementById(`qty-${p.id}`);
+  const btnFaltante = card.querySelector('.toggle-faltante');
+  const item = inventoryState.items[p.id];
+  
+  qtyDisplay.innerText = `◆ ${formatQty(p, item.qty)}`;
+  
+  if(isFaltante(p)){
+    card.classList.add('faltante');
+  } else {
+    card.classList.remove('faltante');
+  }
+  
+  if(item.manualFaltante){
+    btnFaltante.classList.add('on');
+  } else {
+    btnFaltante.classList.remove('on');
+  }
 }
 
-// Renderiza el panel de "Resumen de Faltantes".
 function renderMissingSummary(){
-  const container = document.getElementById("missing-summary");
+  const summary = document.getElementById("missing-summary");
   const missing = PRODUCTS.filter(isFaltante);
-  if(missing.length===0){
-    container.innerHTML = `<p class="missing-empty">No hay productos marcados como faltantes.</p>`;
+  
+  if(missing.length === 0){
+    summary.innerHTML = `<p class="missing-empty">No hay productos marcados como faltantes.</p>`;
     return;
   }
-  container.innerHTML = `
-    <ul class="missing-list">
-      ${missing.map(p=>`
-        <li>
-          <span class="dot"></span>
-          <b>${p.name}</b>
-          <small>${CATEGORIES[p.cat]}</small>
-        </li>`).join("")}
-    </ul>`;
-}
-
-// Guarda el inventario actual en LocalStorage con marca de tiempo,
-// y conserva un historial breve para los reportes del dueño.
-function saveInventory(){
-  const nameInput = document.getElementById("employee-name");
-  const employeeName = nameInput.value.trim();
-
-  // Validación: el nombre es obligatorio para identificar quién registró el inventario
-  if(employeeName === ""){
-    nameInput.style.borderColor = "var(--danger)";
-    nameInput.focus();
-    nameInput.placeholder = "Escribe tu nombre para poder guardar";
-    return;
-  }
-  nameInput.style.borderColor = "";
-
-  inventoryState.lastSaved = new Date().toISOString();
-  inventoryState.lastEmployee = employeeName;
-  persistInventory();
-
-  // Guardar snapshot en el historial (para cálculos de reporte)
-  const history = JSON.parse(localStorage.getItem("dt_history_v1") || "[]");
-  history.push({
-    date: inventoryState.lastSaved,
-    employee: employeeName,
-    items: JSON.parse(JSON.stringify(inventoryState.items))
+  
+  let html = `<ul class="missing-list">`;
+  missing.forEach(p=>{
+    const item = inventoryState.items[p.id];
+    const reason = item.qty <= 0 ? "(Agotado)" : "(Marcado manual)";
+    html += `<li>
+      <div class="dot"></div>
+      <span><b>${p.name}</b> — Zona: ${CATEGORIES[p.cat]}</span>
+      <small>${reason} ${item.comment ? ' ✎ '+item.comment : ''}</small>
+    </li>`;
   });
-  // Conservar como máximo los últimos 120 registros
-  while(history.length > 120) history.shift();
-  localStorage.setItem("dt_history_v1", JSON.stringify(history));
-
-  renderLastSaved();
-}
-
-function renderLastSaved(){
-  const el = document.getElementById("last-saved");
-  const elEmp = document.getElementById("last-employee");
-  if(!inventoryState.lastSaved){
-    el.textContent = "sin registros aún";
-    elEmp.textContent = "—";
-    return;
-  }
-  const d = new Date(inventoryState.lastSaved);
-  el.textContent = d.toLocaleString("es-MX", {
-    day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"
-  });
-  elEmp.textContent = inventoryState.lastEmployee || "—";
-
-  // Precargar el campo de nombre con el último empleado que guardó,
-  // para agilizar registros consecutivos del mismo turno.
-  const nameInput = document.getElementById("employee-name");
-  if(nameInput && !nameInput.value){
-    nameInput.value = inventoryState.lastEmployee || "";
-  }
+  html += `</ul>`;
+  summary.innerHTML = html;
 }
 
 /* ================================================================
-   5. TABS — VISTA TRABAJADOR
+   5. NAVEGACIÓN ENTRE TABS (Trabajador y Dueño)
 ================================================================ */
-function switchWorkerTab(tab, btn){
-  document.querySelectorAll("#worker-tabs .btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById("wpanel-trad").classList.toggle("active", tab==="trad");
-  document.getElementById("wpanel-esp").classList.toggle("active", tab==="esp");
+function switchWorkerTab(type, btn){
+  document.querySelectorAll("#worker-tabs .btn").forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const pTrad = document.getElementById("wpanel-trad");
+  const pEsp = document.getElementById("wpanel-esp");
+  
+  if(type === 'trad'){
+    pTrad.classList.add('active');
+    pEsp.classList.remove('active');
+  } else {
+    pTrad.classList.remove('active');
+    pEsp.classList.add('active');
+  }
+}
+
+function switchOwnerTab(type, btn){
+  document.querySelectorAll("#owner-tabs .btn").forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  generateReport();
 }
 
 /* ================================================================
-   6. MODAL / ACCESO VISTA DUEÑO
+   6. VISTA DUEÑO Y LÓGICA DE REPORTES EXCLUSIVOS
 ================================================================ */
 function openOwnerModal(){
-  document.getElementById("owner-error").textContent = "";
   document.getElementById("owner-password").value = "";
+  document.getElementById("owner-error").innerText = "";
   document.getElementById("owner-modal").showModal();
-  document.getElementById("owner-password").focus();
 }
+
 function closeOwnerModal(){
   document.getElementById("owner-modal").close();
 }
+
 function checkOwnerPassword(){
-  const val = document.getElementById("owner-password").value;
-  if(val === OWNER_PASSWORD){
+  const pass = document.getElementById("owner-password").value;
+  if(pass === OWNER_PASSWORD){
     closeOwnerModal();
     document.getElementById("view-worker").classList.add("hidden");
     document.getElementById("view-owner").classList.remove("hidden");
     initOwnerView();
   } else {
-    document.getElementById("owner-error").textContent = "Contraseña incorrecta. Intenta de nuevo.";
+    document.getElementById("owner-error").innerText = "Contraseña incorrecta. Inténtalo de nuevo.";
   }
 }
+
 function closeOwnerView(){
   document.getElementById("view-owner").classList.add("hidden");
   document.getElementById("view-worker").classList.remove("hidden");
 }
 
-// Permite confirmar con Enter dentro del modal
-document.addEventListener("DOMContentLoaded", ()=>{
-  document.getElementById("owner-password").addEventListener("keydown", e=>{
-    if(e.key === "Enter") checkOwnerPassword();
-  });
-
-  // Restaurar el borde normal del campo de nombre al escribir
-  document.getElementById("employee-name").addEventListener("input", function(){
-    this.style.borderColor = "";
-  });
-});
-
-/* ================================================================
-   7. TABS — VISTA DUEÑO  (Inventario Tradicional / Menú Especial)
-================================================================ */
-let ownerActiveCats = [1,2,3,4,5,6,7,8,9]; // tradicional por defecto
-
-function switchOwnerTab(tab, btn){
-  document.querySelectorAll("#owner-tabs .btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  ownerActiveCats = (tab==="esp") ? [10] : [1,2,3,4,5,6,7,8,9];
-  populateCategoryFilter();
-  generateReport();
-}
-
-/* ================================================================
-   8. INICIALIZACIÓN VISTA DUEÑO
-================================================================ */
-// Muestra los últimos registros guardados por el personal, con fecha y nombre.
-function renderHistoryLog(){
-  const container = document.getElementById("history-log");
-  const history = JSON.parse(localStorage.getItem("dt_history_v1") || "[]");
-
-  if(history.length === 0){
-    container.innerHTML = `<p class="missing-empty">Aún no hay registros de inventario guardados.</p>`;
-    return;
-  }
-
-  // Mostrar los últimos 8 registros, del más reciente al más antiguo
-  const recent = history.slice(-8).reverse();
-  container.innerHTML = `
-    <ul class="missing-list">
-      ${recent.map(h=>{
-        const d = new Date(h.date);
-        const fecha = d.toLocaleString("es-MX", {
-          day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"
-        });
-        return `
-          <li>
-            <span class="dot"></span>
-            <b>${h.employee || "Sin nombre"}</b>
-            <small>${fecha}</small>
-          </li>`;
-      }).join("")}
-    </ul>`;
-}
-
 function initOwnerView(){
-  // Fechas por defecto: última semana
-  const end = new Date();
-  const start = new Date();
-  start.setDate(end.getDate()-7);
-  document.getElementById("report-start").value = toDateInput(start);
-  document.getElementById("report-end").value   = toDateInput(end);
-  document.getElementById("report-period").value = "week";
-
-  populateCategoryFilter();
-  generateReport();
-  renderPurchasesSaved();
-  renderHistoryLog();
-}
-
-function toDateInput(d){
-  return d.toISOString().slice(0,10);
-}
-
-// Llena el select de categorías según el grupo activo (tradicional/especial)
-function populateCategoryFilter(){
   const select = document.getElementById("report-category");
-  let options = `<option value="all">Ver Todo</option>`;
-  ownerActiveCats.forEach(catId=>{
-    options += `<option value="${catId}">${CATEGORIES[catId]}</option>`;
-  });
-  select.innerHTML = options;
+  let html = `<option value="all">Todas las Zonas</option>`;
+  for(let id in CATEGORIES){
+    if(id == 10 && !menuEspecialDisponible) continue;
+    html += `<option value="${id}">${CATEGORIES[id]}</option>`;
+  }
+  select.innerHTML = html;
+  
+  // Fechas automáticas por defecto
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("report-end").value = today;
+  
+  const start = new Date();
+  start.setDate(start.getDate() - 7);
+  document.getElementById("report-start").value = start.toISOString().split('T')[0];
+  
+  loadHistoryLog();
+  generateReport();
 }
 
-// Atajos de período: última semana / último mes
 function applyQuickPeriod(){
   const period = document.getElementById("report-period").value;
   if(!period) return;
-  const end = new Date();
-  const start = new Date();
-  if(period === "week") start.setDate(end.getDate()-7);
-  if(period === "month") start.setMonth(end.getMonth()-1);
-  document.getElementById("report-start").value = toDateInput(start);
-  document.getElementById("report-end").value   = toDateInput(end);
+  const today = new Date();
+  document.getElementById("report-end").value = today.toISOString().split('T')[0];
+  
+  if(period === 'week'){
+    today.setDate(today.getDate() - 7);
+  } else if(period === 'month') {
+    today.setMonth(today.getMonth() - 1);
+  }
+  document.getElementById("report-start").value = today.toISOString().split('T')[0];
+}
+
+function loadHistoryLog(){
+  const logContainer = document.getElementById("history-log");
+  if(inventoryState.lastSaved){
+    logContainer.innerHTML = `<p class="missing-empty" style="color:var(--olive);">
+      Último inventario registrado el <b>${inventoryState.lastSaved}</b> por <b>${inventoryState.lastEmployee || 'Anónimo'}</b>.
+    </p>`;
+  } else {
+    logContainer.innerHTML = `<p class="missing-empty">No hay registros históricos en este dispositivo todavía.</p>`;
+  }
 }
 
 /* ================================================================
-   9. GENERACIÓN DE REPORTES
-   Lógica: para cada producto, se compara la cantidad registrada
-   más antigua y más reciente dentro del rango de fechas.
-   - Si el producto estuvo marcado "Faltante" en algún punto del
-     rango, se asume que se realizó una compra de reabastecimiento
-     hasta su nivel "ideal" (ideal de reorden).
-   - Si no, la compra estimada es el incremento neto de existencias
-     (cantidad final - cantidad inicial), si fue positivo.
-   Estos valores son editables por el dueño antes de guardar.
+   7. GENERACIÓN DEL REPORTE DE COMPRAS (VISTA DUEÑO)
 ================================================================ */
+let currentPurchasesState = {};
+
 function generateReport(){
-  const startVal = document.getElementById("report-start").value;
-  const endVal   = document.getElementById("report-end").value;
+  const targetTab = document.querySelector("#owner-tabs .btn.active").id;
+  const isEspecialTab = (targetTab === 'otab-esp');
   const catFilter = document.getElementById("report-category").value;
-
-  const start = startVal ? new Date(startVal+"T00:00:00") : null;
-  const end   = endVal   ? new Date(endVal+"T23:59:59")   : null;
-
-  const history = JSON.parse(localStorage.getItem("dt_history_v1") || "[]");
-  const inRange = history.filter(h=>{
-    const d = new Date(h.date);
-    return (!start || d >= start) && (!end || d <= end);
-  });
-
-  // Cargar compras previamente guardadas (para no perder ediciones manuales)
-  const savedPurchases = JSON.parse(localStorage.getItem(LS_PURCHASES) || "{}").items || {};
-
-  const productsToShow = PRODUCTS.filter(p=>{
-    if(!ownerActiveCats.includes(p.cat)) return false;
-    if(catFilter !== "all" && String(p.cat) !== catFilter) return false;
-    return true;
-  });
-
-  // Calcular estimado de compra por producto
-  const estimates = {};
-  productsToShow.forEach(p=>{
-    let qtyStart, qtyEnd, wasFaltante=false;
-
-    if(inRange.length > 0){
-      qtyStart = inRange[0].items[p.id]?.qty ?? inventoryState.items[p.id].qty;
-      qtyEnd   = inRange[inRange.length-1].items[p.id]?.qty ?? inventoryState.items[p.id].qty;
-      wasFaltante = inRange.some(h => {
-        const it = h.items[p.id];
-        return it && (it.manualFaltante || it.qty <= 0);
-      });
-    } else {
-      // Sin registros en el rango: usar el estado actual como referencia
-      qtyStart = inventoryState.items[p.id].qty;
-      qtyEnd   = inventoryState.items[p.id].qty;
-      wasFaltante = isFaltante(p);
-    }
-
-    let estimate = Math.max(0, qtyEnd - qtyStart);
-    if(wasFaltante) estimate = Math.max(estimate, p.ideal);
-
-    estimates[p.id] = Math.round(estimate*100)/100;
-  });
-
-  renderReport(productsToShow, estimates, savedPurchases);
-}
-
-// Renderiza el reporte agrupado por categoría con campos editables.
-function renderReport(products, estimates, savedPurchases){
-  const container = document.getElementById("report-output");
-  const byCat = {};
-  products.forEach(p=>{ (byCat[p.cat] = byCat[p.cat] || []).push(p); });
-
-  if(products.length===0){
-    container.innerHTML = `<p class="missing-empty">No hay productos para mostrar con estos filtros.</p>`;
-    return;
+  const output = document.getElementById("report-output");
+  
+  // Carga compras previas guardadas si existen
+  const rawPurchases = localStorage.getItem(LS_PURCHASES);
+  if(rawPurchases && Object.keys(currentPurchasesState).length === 0){
+    try { currentPurchasesState = JSON.parse(rawPurchases); } catch(e){}
   }
 
+  let activeCats = isEspecialTab ? [10] : [1, 2, 3];
   let html = "";
-  Object.keys(byCat).forEach(catId=>{
+
+  activeCats.forEach(catId=>{
+    if(catFilter !== 'all' && catFilter != catId) return;
+    
+    const items = PRODUCTS.filter(p=>p.cat === catId);
+    if(items.length === 0) return;
+
     html += `
       <div class="section">
         <div class="section-head">
           <div class="diamond"></div>
-          <h2>${CATEGORIES[catId]}</h2>
+          <h2>Compras sugeridas: ${CATEGORIES[catId]}</h2>
           <div class="line"></div>
         </div>
-        <div>
-          ${byCat[catId].map(p=>{
-            const saved = savedPurchases[p.id];
-            const value = (saved !== undefined) ? saved : estimates[p.id];
-            const decimals = p.step < 1 ? 1 : 0;
-            return `
-              <div class="purchase-row">
-                <span class="dot"></span>
-                <span class="pname">${p.name}</span>
-                <span class="ideal">ideal: ${p.ideal.toFixed(decimals)} ${p.unit}</span>
-                <input type="text" id="purchase-${p.id}" value="${value.toFixed(decimals)}"
-                       inputmode="decimal">
-                <span class="unit">${p.unit}</span>
-              </div>`;
-          }).join("")}
-        </div>
-      </div>`;
+        <div style="background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:8px 20px;">`;
+
+    items.forEach(p=>{
+      const currentStock = inventoryState.items[p.id].qty;
+      // Cálculo inteligente basado en el stock ingresado por el trabajador vs nivel ideal
+      let sugerido = p.ideal - currentStock;
+      if(sugerido < 0) sugerido = 0;
+      
+      if(!currentPurchasesState[p.id]){
+        currentPurchasesState[p.id] = sugerido.toFixed(p.step < 1 ? 1 : 0);
+      }
+
+      html += `
+        <div class="purchase-row">
+          <div class="dot" style="background:${isFaltante(p) ? 'var(--danger)' : 'var(--gold)'}"></div>
+          <div class="pname">${p.name} <span style="font-size:0.75rem; color:var(--olive-soft);">(${formatQty(p, currentStock)} actual)</span></div>
+          <div class="ideal">Ideal: ${p.ideal} ${p.unit}</div>
+          <input type="text" value="${currentPurchasesState[p.id]}" 
+                 oninput="currentPurchasesState['${p.id}'] = this.value">
+          <div class="unit">${p.unit}</div>
+        </div>`;
+    });
+
+    html += `</div></div>`;
   });
-  container.innerHTML = html;
+
+  output.innerHTML = html || `<p class="missing-empty">No hay datos que coincidan con los filtros seleccionados.</p>`;
+  
+  // Set meta info para impresión
+  document.getElementById("print-meta").innerHTML = `
+    <p style="font-size:0.85rem; color:var(--olive-soft); margin-bottom:16px;">
+      Período: ${document.getElementById("report-start").value} al ${document.getElementById("report-end").value}<br>
+      Generado el: ${new Date().toLocaleString()}
+    </p>`;
 }
 
 /* ================================================================
-   10. GUARDAR REPORTE DE COMPRAS
+   8. PROCESOS DE GUARDADO Y EXPORTACIÓN
 ================================================================ */
+function saveInventory(){
+  const employee = document.getElementById("employee-name").value.trim();
+  if(!employee){
+    alert("Por favor, introduce tu nombre antes de guardar el inventario.");
+    return;
+  }
+  
+  const now = new Date().toLocaleString();
+  inventoryState.lastSaved = now;
+  inventoryState.lastEmployee = employee;
+  
+  persistInventory();
+  
+  document.getElementById("last-saved").innerText = now;
+  document.getElementById("last-employee").innerText = employee;
+  
+  alert("¡Inventario por zonas guardado exitosamente localmente!");
+  renderMissingSummary();
+}
+
 function savePurchases(){
-  const items = {};
-  PRODUCTS.forEach(p=>{
-    const input = document.getElementById(`purchase-${p.id}`);
-    if(input){
-      const val = parseFloat(input.value);
-      items[p.id] = isNaN(val) ? 0 : val;
-    }
-  });
-  const payload = { items, lastSaved: new Date().toISOString() };
-  localStorage.setItem(LS_PURCHASES, JSON.stringify(payload));
-  renderPurchasesSaved();
-}
-
-function renderPurchasesSaved(){
-  const raw = localStorage.getItem(LS_PURCHASES);
-  const el = document.getElementById("purchases-saved");
-  if(!raw){ el.textContent = "sin registros aún"; return; }
-  const data = JSON.parse(raw);
-  const d = new Date(data.lastSaved);
-  el.textContent = d.toLocaleString("es-MX", {
-    day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"
-  });
-}
-
-/* ================================================================
-   11. EXPORTACIÓN — PDF (impresión) y EXCEL (CSV)
-================================================================ */
-function exportPDF(){
-  window.print();
+  localStorage.setItem(LS_PURCHASES, JSON.stringify(currentPurchasesState));
+  const now = new Date().toLocaleString();
+  document.getElementById("purchases-saved").innerText = now;
+  alert("Reporte de compras mensuales/semanales guardado correctamente.");
 }
 
 function exportExcel(){
-  const rows = [["Categoría","Producto","Cantidad comprada","Unidad","Ideal de reorden"]];
+  let csv = "Producto,Zona,Stock Actual,Unidad,Compra Registrada\n";
   PRODUCTS.forEach(p=>{
-    if(!ownerActiveCats.includes(p.cat)) return;
-    const input = document.getElementById(`purchase-${p.id}`);
-    const value = input ? input.value : "";
-    if(input){
-      rows.push([CATEGORIES[p.cat], p.name, value, p.unit, p.ideal]);
-    }
+    const stock = inventoryState.items[p.id].qty;
+    const compra = currentPurchasesState[p.id] || "0";
+    csv += `"${p.name}","${CATEGORIES[p.cat]}",${stock},"${p.unit}",${compra}\n`;
   });
-  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob = new Blob(["\uFEFF"+csv], {type:"text/csv;charset=utf-8;"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `reporte_compras_dos_tiempos_${toDateInput(new Date())}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute("download", `compras_dos_tiempos_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
-/* ================================================================
-   12. INICIALIZACIÓN GENERAL
-================================================================ */
-function init(){
-  // Ocultar pestaña/sección de Menú Especial si está deshabilitada
-  if(!menuEspecialDisponible){
-    document.getElementById("wtab-esp").classList.add("hidden");
-    document.getElementById("otab-esp").classList.add("hidden");
+// Inicialización de la UI del trabajador al cargar
+window.addEventListener("DOMContentLoaded", ()=>{
+  renderWorkerPanel("wpanel-trad", [1, 2, 3]);
+  if(menuEspecialDisponible){
+    renderWorkerPanel("wpanel-esp", [10]);
+  } else {
+    document.getElementById("wtab-esp").style.display = "none";
   }
-
-  renderWorkerPanel("wpanel-trad", [1,2,3,4,5,6,7,8,9]);
-  renderWorkerPanel("wpanel-esp",  [10]);
+  
+  if(inventoryState.lastSaved){
+    document.getElementById("last-saved").innerText = inventoryState.lastSaved;
+    document.getElementById("last-employee").innerText = inventoryState.lastEmployee || "Anónimo";
+    document.getElementById("employee-name").value = inventoryState.lastEmployee || "";
+  }
   renderMissingSummary();
-  renderLastSaved();
-}
-
-init();
+});
 </script>
 </body>
 </html>
